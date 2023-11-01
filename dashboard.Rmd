@@ -17,7 +17,7 @@ library(plotly)
 Column {data-width=650}
 -----------------------------------------------------------------------
 
-### Top 10 Cuisine by quantity
+### Top 10 Cuisine by Quantity
 
 ```{r}
 data(rest_inspec)

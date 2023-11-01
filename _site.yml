@@ -9,6 +9,11 @@ navbar:
       href: dashboard.html
     - text: "About"
       href: about.html
+    - icon: fa-envelope fa-lg
+      href: mailto:<adaluchen1117@gmail.com>
+    - icon: fa-github fa-lg
+      href: http://github.com/EnRouteAllMyLife/
+
 output:
   html_document:
     theme: journal
