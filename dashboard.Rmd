@@ -1,0 +1,69 @@
+---
+title: "DashBoard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    source: embed
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(p8105.datasets)
+library(plotly)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Top 20 Cuisine by quantity
+
+
+```{r}
+#data(rest_inspec)
+rest_inspec %>% drop_na(score) %>% group_by(cuisine_description) %>%
+               summarise(cnt = length(unique(camis))) %>% 
+               slice_max(order_by = cnt, n = 20) %>% 
+               mutate( cuisine_description =  gsub("\\([^)]+\\)", "", cuisine_description),
+                       cuisine_description = gsub("/.*", "", cuisine_description),
+                       cuisine_description = fct_reorder(cuisine_description, cnt))%>% 
+               plot_ly(
+                       x = ~cuisine_description,y = ~cnt, type = "bar", 
+                       color = ~cuisine_description, colors = "viridis", alpha = 0.5)  %>% 
+               #add_histogram() %>%
+               add_text(
+                        text = ~scales::comma(cnt), y = ~ cnt, 
+                        textposition = "top middle", 
+                        cliponaxis = FALSE
+                      ) %>%
+               layout(showlegend = FALSE,
+                      xaxis = list(title = "Cuisine Description"),
+                      yaxis = list(title = "Restaurant Count"))
+
+```
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Scores of American Cuisine in Five Boroughs
+
+```{r}
+rest_inspec %>% drop_na(score) %>% filter(cuisine_description == "American") %>%
+               plot_ly(
+                       x = ~boro, y = ~ score, type = "box", 
+                       color = ~boro, colors = "viridis", alpha = 0.5)  %>% 
+               layout(showlegend = FALSE,
+                      xaxis = list(title = "American in 5 Boroughs"),
+                      yaxis = list(title = "Restaurant Count"))
+```
+
+### Chart C
+
+```{r}
+nyc_airbnb %>% 
+  mutate(neighbourhood = fct_reorder(neighbourhood, price))  %>% 
+  plot_ly(y = ~price, color = ~neighbourhood, type = "box", colors = "viridis")
+```
+
