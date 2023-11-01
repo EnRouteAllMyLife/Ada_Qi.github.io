@@ -17,14 +17,13 @@ library(plotly)
 Column {data-width=650}
 -----------------------------------------------------------------------
 
-### Top 20 Cuisine by quantity
-
+### Top 10 Cuisine by quantity
 
 ```{r}
-#data(rest_inspec)
+data(rest_inspec)
 rest_inspec %>% drop_na(score) %>% group_by(cuisine_description) %>%
                summarise(cnt = length(unique(camis))) %>% 
-               slice_max(order_by = cnt, n = 20) %>% 
+               slice_max(order_by = cnt, n = 10) %>% 
                mutate( cuisine_description =  gsub("\\([^)]+\\)", "", cuisine_description),
                        cuisine_description = gsub("/.*", "", cuisine_description),
                        cuisine_description = fct_reorder(cuisine_description, cnt))%>% 
@@ -42,12 +41,12 @@ rest_inspec %>% drop_na(score) %>% group_by(cuisine_description) %>%
                       yaxis = list(title = "Restaurant Count"))
 
 ```
-```
+
+
 
 Column {data-width=350}
 -----------------------------------------------------------------------
-
-### Scores of American Cuisine in Five Boroughs
+### BoxPlots of Scores of American Cuisine in Five Boroughs
 
 ```{r}
 rest_inspec %>% drop_na(score) %>% filter(cuisine_description == "American") %>%
@@ -58,12 +57,21 @@ rest_inspec %>% drop_na(score) %>% filter(cuisine_description == "American") %>%
                       xaxis = list(title = "American in 5 Boroughs"),
                       yaxis = list(title = "Restaurant Count"))
 ```
-
-### Chart C
+### Scores of American Cuisine in Five Boroughs over Inspection Time
 
 ```{r}
-nyc_airbnb %>% 
-  mutate(neighbourhood = fct_reorder(neighbourhood, price))  %>% 
-  plot_ly(y = ~price, color = ~neighbourhood, type = "box", colors = "viridis")
+data(rest_inspec)
+rest_inspec %>% drop_na(inspection_date) %>%drop_na(score) %>%  
+  filter(cuisine_description == "American") %>%
+  mutate(inspection_yearmonth =  substr(inspection_date, 1,7)) %>% 
+  group_by(inspection_yearmonth, boro) %>% summarise( mean_score = mean(score),.groups = "keep") %>% 
+               plot_ly(
+                       x = ~inspection_yearmonth,y = ~mean_score, type = 'scatter' , mode = 'markers' ,
+                       color = ~boro, colors = "viridis", alpha = 0.5)  %>% 
+               
+               layout(
+                      xaxis = list(title = "Inspection Date"),
+                      yaxis = list(title = "Score"))
+
 ```
 
